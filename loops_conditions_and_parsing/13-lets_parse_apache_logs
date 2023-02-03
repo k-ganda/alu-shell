@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 # This is a script that displays visitor IP
 
-awk '{ print "IP HTTP_CODE" }'
+awk '{ print "IP HTTP_CODE" $1,7 }'
