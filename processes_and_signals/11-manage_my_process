@@ -1,32 +1,68 @@
 #!/usr/bin/env bash
 # Managing processes
 
-start () {
-    ./manage_my_process &
-    echo $! > /var/run/my_process.pid
-    echo "manage_my_process started"
+PROGRAM='manage_my_process'
+
+RELPATH="${0%/*}/${PROGRAM}"
+
+PIDFILE="${PIDFILE:-/var/run/my_process.pid}"
+
+declare -A MESSAGES=(
+
+    ['start']='started'
+
+    ['stop']='stopped'
+
+    ['restart']='restarted'
+
+)
+
+
+
+start() {
+
+    exec -- "${RELPATH}" &
+
+    echo "$!" >| "${PIDFILE}"
+
 }
 
-stop () {
-    pkill -f "./manage_my_process"
-    rm /var/run/my_process.pid
-    echo "manage_my_process stopped"
+
+
+stop() {
+
+  trap '
+    trap RETURN
+    rm -f -- "${PIDFILE}"
+  ' RETURN
+
+  kill -- "$(< "${PIDFILE}")" 2> /dev/null
+
 }
 
-restart () {
-    pkill -f "./manage_my_process"    
-    rm /var/run/my_process.pid
-    ./manage_my_process &
-    echo $! >> /var/run/my_process.pid
-    echo "manage_my_process restarted"
+
+
+restart() {
+
+    stop
+
+    start
+
 }
 
-case "$1" in
-   start) start ;;
-   stop)  stop;;
-   restart) restart;;
-   *) echo "Usage: manage_my_process {start|stop|restart}"
-    
-      ;;
-esac
+
+
+if (( $# == 1 )) && [[ -v "MESSAGES[$1]" ]]
+
+then
+
+    "$1" && printf '%s %s\n' "${PROGRAM}" "${MESSAGES[$1]}"
+
+else
+
+    printf 'Usage: %s {start|stop|restart}\n' "${PROGRAM}"
+
+    exit 1
+
+fi
 
