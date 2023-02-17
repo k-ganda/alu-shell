@@ -1,23 +1,8 @@
 #!/usr/bin/env bash
-# Bash script 11-manage_my_process that manages manage_my_process and pushes both files to git
+# print all running pid
 
-if [ "$1" == "start" ]
-then
-	./manage_my_process &
-	sudo bash -c "echo $$ > /var/run/my_process.pid"
-	echo "manage_my_process started"
-elif [ "$1" == "stop" ]
-then
-	pkill -f ./manage_my_process
-	sudo rm -f /var/run/my_process.pid
-	echo "manage_my_process stopped"
-elif [ "$1" == "restart" ]
-then
-	pkill -f ./manage_my_process
-	sudo rm -f /var/run/my_process.pid
-	./manage_my_process &
-	sudo bash -c "echo $$ > /var/run/my_process.pid"
-	echo "manage_my_process restarted"
-else
-	echo "Usage: manage_my_process {start|stop|restart}"
-fi
+while :
+do
+	echo "I am alive!" >> /tmp/my_process
+	sleep 2
+done
